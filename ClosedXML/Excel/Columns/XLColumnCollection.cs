@@ -82,6 +82,12 @@ namespace ClosedXML.Excel
             return _dictionary.TryRemove(item.Key, out _);
         }
 
+        public void RemoveAll(Func<XLColumn, Boolean> predicate)
+        {
+            foreach (var key in _dictionary.Keys.Where(k => predicate(_dictionary[k])).ToList())
+                _dictionary.TryRemove(key, out _);
+        }
+
         public IEnumerator<KeyValuePair<int, XLColumn>> GetEnumerator() => _dictionary.GetEnumerator();
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => _dictionary.GetEnumerator();

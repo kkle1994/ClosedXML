@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ClosedXML.Utils;
 
-public class ConcurrentList<T> : IEnumerable<T>, ICollection<T> where T : notnull
+public class ConcurrentCollection<T> : IEnumerable<T>, ICollection<T> where T : notnull
 {
     ConcurrentDictionary<T, object?> innerDictionary = new();
 

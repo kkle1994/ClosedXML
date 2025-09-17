@@ -11,7 +11,7 @@ namespace ClosedXML.Excel.Drawings
 {
     internal class XLPictures : IXLPictures, IEnumerable<XLPicture>
     {
-        private readonly ConcurrentList<XLPicture> _pictures = new ConcurrentList<XLPicture>();
+        private readonly ConcurrentCollection<XLPicture> _pictures = new ConcurrentCollection<XLPicture>();
         private readonly XLWorksheet _worksheet;
 
         public XLPictures(XLWorksheet worksheet)

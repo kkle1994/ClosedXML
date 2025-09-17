@@ -159,12 +159,6 @@ namespace ClosedXML.Excel
                     id++;
                 }
             }
-
-            public void Reset(RelType relType)
-            {
-                if (_relIds.ContainsKey(relType))
-                    _relIds.TryRemove(relType, out _);
-            }
         }
 
         #endregion Nested type: RelIdGenerator

@@ -1,5 +1,7 @@
+using ClosedXML.Utils;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,7 +11,7 @@ namespace ClosedXML.Excel.Drawings
 {
     internal class XLPictures : IXLPictures, IEnumerable<XLPicture>
     {
-        private readonly List<XLPicture> _pictures = new List<XLPicture>();
+        private readonly ConcurrentList<XLPicture> _pictures = new ConcurrentList<XLPicture>();
         private readonly XLWorksheet _worksheet;
 
         public XLPictures(XLWorksheet worksheet)
@@ -147,12 +149,15 @@ namespace ClosedXML.Excel.Drawings
 
         private String GetNextPictureName()
         {
-            var pictureNumber = this.Count;
-            while (_pictures.Any(p => p.Name == $"Picture {pictureNumber}"))
-            {
-                pictureNumber++;
-            }
-            return $"Picture {pictureNumber}";
+            return RandomString(31);
+        }
+
+        public static string RandomString(int length)
+        {
+            var random = new Random();
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }

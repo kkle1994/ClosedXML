@@ -2,6 +2,7 @@
 
 using DocumentFormat.OpenXml.Packaging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -97,14 +98,14 @@ namespace ClosedXML.Excel
 
         internal sealed class RelIdGenerator
         {
-            private readonly Dictionary<RelType, HashSet<String>> _relIds = new();
+            private readonly ConcurrentDictionary<RelType, HashSet<String>> _relIds = new();
 
             public void AddValues(IEnumerable<String> values, RelType relType)
             {
                 if (!_relIds.TryGetValue(relType, out var set))
                 {
                     set = new HashSet<string>();
-                    _relIds.Add(relType, set);
+                    _relIds.TryAdd(relType, set);
                 }
 
                 set.UnionWith(values);
@@ -143,7 +144,7 @@ namespace ClosedXML.Excel
                 if (!_relIds.TryGetValue(relType, out var set))
                 {
                     set = new HashSet<String>();
-                    _relIds.Add(relType, set);
+                    _relIds.TryAdd(relType, set);
                 }
 
                 var id = set.Count + 1;
@@ -157,6 +158,12 @@ namespace ClosedXML.Excel
                     }
                     id++;
                 }
+            }
+
+            public void Reset(RelType relType)
+            {
+                if (_relIds.ContainsKey(relType))
+                    _relIds.TryRemove(relType, out _);
             }
         }
 

@@ -1,6 +1,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,26 +9,26 @@ namespace ClosedXML.Excel
 {
     internal class XLColumnsCollection : IDictionary<Int32, XLColumn>
     {
-        private readonly Dictionary<Int32, XLColumn> _dictionary = new();
+        private readonly ConcurrentDictionary<Int32, XLColumn> _dictionary = new();
 
         public void ShiftColumnsRight(Int32 startingColumn, Int32 columnsToShift)
         {
             foreach (var co in _dictionary.Keys.Where(k => k >= startingColumn).OrderByDescending(k => k))
             {
                 var columnToMove = _dictionary[co];
-                _dictionary.Remove(co);
+                _dictionary.TryRemove(co, out _);
                 Int32 newColumnNum = co + columnsToShift;
                 if (newColumnNum <= XLHelper.MaxColumnNumber)
                 {
                     columnToMove.SetColumnNumber(newColumnNum);
-                    _dictionary.Add(newColumnNum, columnToMove);
+                    _dictionary.TryAdd(newColumnNum, columnToMove);
                 }
             }
         }
 
         public void Add(int key, XLColumn value)
         {
-            _dictionary.Add(key, value);
+            _dictionary.TryAdd(key, value);
         }
 
         public bool ContainsKey(int key) => _dictionary.ContainsKey(key);
@@ -36,7 +37,7 @@ namespace ClosedXML.Excel
 
         public bool Remove(int key)
         {
-            return _dictionary.Remove(key);
+            return _dictionary.TryRemove(key, out _);
         }
         
         public bool TryGetValue(int key, out XLColumn value)
@@ -54,7 +55,7 @@ namespace ClosedXML.Excel
 
         public void Add(KeyValuePair<int, XLColumn> item)
         {
-            _dictionary.Add(item.Key, item.Value);
+            _dictionary.TryAdd(item.Key, item.Value);
         }
 
         public void Clear()
@@ -78,16 +79,11 @@ namespace ClosedXML.Excel
 
         public bool Remove(KeyValuePair<int, XLColumn> item)
         {
-            return _dictionary.Remove(item.Key);
+            return _dictionary.TryRemove(item.Key, out _);
         }
 
         public IEnumerator<KeyValuePair<int, XLColumn>> GetEnumerator() => _dictionary.GetEnumerator();
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => _dictionary.GetEnumerator();
-
-        public void RemoveAll(Func<XLColumn, Boolean> predicate)
-        {
-            _dictionary.RemoveAll(predicate);
-        }
     }
 }
